@@ -21,7 +21,7 @@ async function connectToDatabase() {
         console.log(`Successfully connected to ${mongo_uri}`);
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);
-        process.exit(1); // Salir del proceso si hay un error
+        process.exit(1); 
     }
 }
 
@@ -36,45 +36,56 @@ app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html')); 
 });
 
+
 // Registro
 app.post('/register', async (req, res) => {
     const { username, password, phone, email } = req.body;
-    console.log('Datos recibidos:', { username, password, phone, email }); // Verificar los datos
-    
+    console.log('Datos recibidos:', { username, password, phone, email }); 
+
     const user = new User({ username, password, phone, email });
 
     try {
         await user.save(); 
-        console.log('Usuario registrado:', user); // Mirar el usuario guardado
-        return res.status(200).send('USUARIO REGISTRADO');
+        console.log('Usuario registrado:', user); 
+        return res.redirect('/login.html'); 
     } catch (err) {
-        return res.status(500).send('ERROR AL REGISTRAR AL USUARIO: ' + err.message);
+        console.error('Error al registrar al usuario:', err); 
+        return res.redirect('/register.html'); 
     }
 });
 
 
+
 app.post('/authenticate', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Datos recibidos para login:', { username, password }); // Datos recibidos
 
     try {
+        // Busca el usuario por su nombre de usuario
         const user = await User.findOne({ username });
-        console.log('Usuario encontrado:', user); // Se encontro el usuario?
 
+        // Si no se encuentra el usuario, devuelve un mensaje adecuado
         if (!user) {
             return res.status(401).send('Usuario no existe');
         }
 
+        // Verifica si la contraseña es correcta
         const isMatch = await user.isCorrectPassword(password);
         if (!isMatch) {
             return res.status(401).send('Contraseña incorrecta');
         }
 
-        res.send('Autenticación exitosa');
+        // Si la autenticación es correcta, redirige al formulario con el nombre del usuario
+        res.redirect(`/formulario?username=${user.username}`);
     } catch (error) {
         res.status(500).send('Error en el servidor: ' + error.message);
     }
 });
+
+app.get('/formulario', (req, res) => {
+    const username = req.query.username; // Obtén el nombre del usuario autenticado
+    res.sendFile(path.join(__dirname, 'public', 'formulario.html')); // Muestra el formulario
+});
+
 
 
 

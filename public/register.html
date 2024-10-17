@@ -60,6 +60,15 @@
             }
             return true; // Permite el envío del formulario
         }
+
+        // Leer parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        
+        // Mostrar alerta si hay un mensaje de error
+        if (error) {
+            alert('Error: ' + error);
+        }
     </script>
 
 </body>
