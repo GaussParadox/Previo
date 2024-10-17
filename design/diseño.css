@@ -1,0 +1,15 @@
+body {
+    background: url('/imagenes/fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-container {
+    background-color: rgba(255, 255, 255, 0.8); 
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 200px rgba(200, 5, 5, 0.1);
+}
