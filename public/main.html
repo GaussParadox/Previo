@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tienda de zapatos con las últimas tendencias y estilos.">
+    <title>Tienda de Zapatos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="design/styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Zapatos Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Icono de usuario -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#userModal">
+                            <i class="bi bi-person-circle"></i> Mi Cuenta
+                        </a>
+                    </li>
+                    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="userModalLabel">Mi Cuenta</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Nombre:</strong> <span id="username">No disponible</span></p>
+                                    <p><strong>Correo:</strong> <span id="email">No disponible</span></p>
+                                    <p><strong>Teléfono:</strong> <span id="phone">No disponible</span></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hombres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mujeres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Ofertas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1>Bienvenidos a Zapatos Store</h1>
+            <p>Encuentra tu estilo con nuestra colección exclusiva.</p>
+            <a href="#" class="btn btn-light btn-lg">Explora la Colección</a>
+        </div>
+    </header>
+
+    <!-- Productos Destacados -->
+    <section class="productos py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Productos Destacados</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/imagenes/zapato1.jpg" class="card-img-top" alt="Zapato 1">
+                        <div class="card-body">
+                            <h5 class="card-title">Zapato Deportivo</h5>
+                            <p class="card-text">Cómodo y elegante, ideal para cualquier ocasión.</p>
+                            <button class="btn btn-primary">Comprar Ahora</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/imagenes/zapato2.jpg" class="card-img-top" alt="Zapato 2">
+                        <div class="card-body">
+                            <h5 class="card-title">Zapato Casual</h5>
+                            <p class="card-text">Perfecto para el día a día con estilo.</p>
+                            <button class="btn btn-primary">Comprar Ahora</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="/imagenes/zapato3.jpg" class="card-img-top" alt="Zapato 3">
+                        <div class="card-body">
+                            <h5 class="card-title">Zapato Formal</h5>
+                            <p class="card-text">El complemento perfecto para eventos importantes.</p>
+                            <button class="btn btn-primary">Comprar Ahora</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2024 Shoes of Hermes. Todos los derechos reservados.</p>
+        <p>Síguenos en:
+            <a href="https://www.facebook.com/wilson.saavedra.927/" class="text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://x.com/BlackShadoww13" class="text-white"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com/w.i.s.o.n/" class="text-white"><i class="fab fa-instagram"></i></a>
+        </p>
+    </footer>
+    
+
+
+
+    <script>
+        // Función para obtener los parámetros de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                username: params.get('username'),
+                email: params.get('email'),
+                phone: params.get('phone'),
+            };
+        }
+    
+        // Cargar los datos del usuario en el modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const { username, email, phone } = getQueryParams();
+    
+            // Asigna los valores al modal solo si existen
+            if (username) document.getElementById('username').textContent = username;
+            if (email) document.getElementById('email').textContent = email;
+            if (phone) document.getElementById('phone').textContent = phone;
+        });
+    </script>
+    
+    
+
+</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

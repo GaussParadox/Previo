@@ -1,0 +1,28 @@
+/* Fondo con gradiente */
+body {
+    background: linear-gradient(to right, #f8f9fa, #e0e0e0);
+}
+
+/* Estilo del Hero */
+.hero {
+    background: url('../imagenes/nuevo\ fondo.jpg') no-repeat center center/cover;
+}
+
+/* Tarjetas de productos */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+    background: #212529;
+}
+.card-img-top {
+    width: 100%;
+    height: 200px; /* Ajusta la altura según prefieras */
+    object-fit: cover; /* Mantiene la proporción de la imagen */
+}
