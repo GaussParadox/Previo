@@ -8,37 +8,113 @@
     <link rel="stylesheet" href="../design/formulario.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="shortcut icon" href="imagenes/Dios.png" />
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
+    <script type="text/javascript">
+        emailjs.init('TRcrGaCWBSYpXwoy0')
+    </script>
 </head>
 <body>
     <div class="container mt-5">
         <div class="form-container">
             <h1 class="text-center">Bienvenido, <span id="username"></span></h1>
-            <form action="https://formspree.io/f/mgveejld" method="POST">
+            <form id="form">
                 <div class="mb-3">
                     <label for="name" class="form-label">Nombre:</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <input type="text" class="form-control" id="name" name="name" readonly>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo Electrónico:</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control" id="email" name="email" readonly>
+                </div>
+                <div class="mb-3"> 
+                    <label for="phone" class="form-label">Teléfono:</label>
+                    <input type="text" class="form-control" id="phone" name="phone" pattern="^\d{10}$" maxlength="10" readonly>
                 </div>
                 <div class="mb-3">
                     <label for="comment" class="form-label">Deja tu comentario:</label>
                     <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Enviar Comentario</button>
-                
+                <button id="button" type="submit" class="btn btn-primary w-100" value="Send Email">Enviar Comentario</button>
             </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get('username');
-        document.getElementById('username').textContent = username;
+        // Función para obtener los parámetros de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                username: params.get('username'),
+                email: params.get('email'),
+                phone: params.get('phone'),
+            };
+        }
+    
+        // Cargar los datos en el formulario
+        document.addEventListener('DOMContentLoaded', () => {
+            const { username, email, phone } = getQueryParams();
+    
+            // Mostrar el username en el mensaje de bienvenida
+            const usernameDisplay = document.getElementById('username');
+            if (username) {
+                usernameDisplay.textContent = username; // Aquí se actualiza el mensaje de bienvenida
+            } else {
+                usernameDisplay.textContent = 'Invitado'; // Mensaje predeterminado si no hay username
+            }
+    
+            // Rellenar los inputs del formulario
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+    
+            if (nameInput && username) nameInput.value = username;
+            if (emailInput && email) emailInput.value = email;
+            if (phoneInput && phone) phoneInput.value = phone;
+        });
+    
+        const btn = document.getElementById('button');
+    
+        document.getElementById('form')
+        .addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const serviceID = 'default_service';
+            const templateID = 'template_rhiedum';
+    
+            emailjs.sendForm(serviceID, templateID, this)
+                .then(() => {
+                    btn.value = 'Send Email';
+                    alert('Mensaje Enviado');
+    
+                    // Obtener los datos del usuario (incluyendo phone)
+                    const nameInput = document.getElementById('name');
+                    const emailInput = document.getElementById('email');
+                    const phoneInput = document.getElementById('phone');
+    
+                    const username = nameInput.value; 
+                    const email = emailInput.value;
+                    const phone = phoneInput.value;
+    
+                    // Construir la URL con parámetros (incluyendo phone)
+                    const urlParams = new URLSearchParams({ 
+                        username: username, 
+                        email: email,
+                        phone: phone
+                    });
+                    const redirectUrl = `main.html?${urlParams.toString()}`;
+    
+                    // Redirigir con la nueva URL
+                    window.location.href = redirectUrl; 
+    
+                }, (err) => {
+                    btn.value = 'Send Email';
+                    alert(JSON.stringify(err));
+                });
+        });
     </script>
-
+    
 </body>
 </html>

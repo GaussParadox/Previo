@@ -67,30 +67,17 @@ app.post('/authenticate', async (req, res) => {
         if (!user) {
             return res.status(401).send('Usuario no existe');
         }
-
         // Verifica si la contraseña es correcta
         const isMatch = await user.isCorrectPassword(password);
         if (!isMatch) {
             return res.status(401).send('Contraseña incorrecta');
         }
-
         // Si la autenticación es exitosa, redirigir con los datos del usuario
         res.redirect(`/main.html?username=${user.username}&email=${user.email}&phone=${user.phone}`);
     } catch (error) {
         res.status(500).send('Error en el servidor: ' + error.message);
     }
 });
-
-//res.redirect(`/formulario?username=${user.username}`);
-//} catch (error) {
-//    res.status(500).send('Error en el servidor: ' + error.message);
-//}
-
-app.get('/formulario', (req, res) => {
-    const username = req.query.username; // Obtén el nombre del usuario autenticado
-    res.sendFile(path.join(__dirname, 'public', 'formulario.html')); // Muestra el formulario
-});
-
 
 // Servidor
 app.listen(3000, () => {
