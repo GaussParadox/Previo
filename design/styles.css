@@ -8,9 +8,27 @@ body {
     background: url('../imagenes/nuevo\ fondo.jpg') no-repeat center center/cover;
 }
 
-/* Tarjetas de productos */
+.col-md-4 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente la tarjeta */
+}
+
 .card {
-    transition: transform 0.2s;
+    text-align: center; /* Centra el contenido dentro de la tarjeta */
+}
+
+.card-img-top {
+    width: 400px; /* Ajusta el ancho deseado */
+    height: 200px; /* Ajusta el alto deseado */
+    object-fit: cover; /* Ajusta la imagen al contenedor */
+    display: block;
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+.btn {
+    display: block; /* Hace que el botón ocupe todo el ancho disponible */
+    margin: 0 auto; /* Centra el botón horizontalmente */
 }
 
 .card:hover {
@@ -21,8 +39,4 @@ body {
 footer {
     background: #212529;
 }
-.card-img-top {
-    width: 100%;
-    height: 200px; /* Ajusta la altura según prefieras */
-    object-fit: cover; /* Mantiene la proporción de la imagen */
-}
+
