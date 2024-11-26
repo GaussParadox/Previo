@@ -3,7 +3,10 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
-const User = require('./public/user'); 
+const User = require('./public/user');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -78,6 +81,71 @@ app.post('/authenticate', async (req, res) => {
         res.status(500).send('Error en el servidor: ' + error.message);
     }
 });
+
+        app.post('/generate-pdf', (req, res) => {
+            const { username, email, phone, product } = req.body;
+
+            // Crear el PDF
+            const doc = new PDFDocument();
+            const filePath = `./public/invoice_${Date.now()}.pdf`;
+
+            doc.pipe(fs.createWriteStream(filePath));
+
+            // Contenido del PDF
+            doc.fontSize(20).text('Factura de Compra', { align: 'center' });
+            doc.moveDown();
+
+            doc.fontSize(14).text(`Nombre del Cliente: ${username}`);
+            doc.text(`Correo Electrónico: ${email}`);
+            doc.text(`Teléfono: ${phone}`);
+            doc.moveDown();
+
+            doc.text('Detalles del Producto:', { underline: true });
+            doc.text(`Producto: ${product.name}`);
+            doc.text(`Precio: ${product.price}`);
+            doc.moveDown();
+
+            doc.text('¡Gracias por tu compra!');
+            doc.end();
+
+            // Configurar nodemailer para enviar el correo
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'wilsonsaavedra9988@gmail.com', // Cambiar por tu email
+                    pass: 'logh kuya xlqn pjky', // Cambiar por tu contraseña
+                },
+            });
+
+            // Opciones del correo
+            const mailOptions = {
+                from: 'wilsonsaavedra9988@gmail.com',
+                to: email,
+                subject: 'Confirmación de Compra',
+                text: `${username}, Hizo la Compra del Producto: ${product.name}.`,
+                attachments: [
+                    {
+                        filename: `Factura_${product.name}.pdf`,
+                        path: filePath,
+                    },
+                ],
+            };
+
+            // Enviar el correo
+            transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    console.error('Error al enviar el correo:', err);
+                    return res.status(500).send('Error al enviar el correo.');
+                }
+
+                console.log('Correo enviado:', info.response);
+                res.send('PDF generado y correo enviado con éxito.');
+            });
+        });
+
+
+
+
 
 // Servidor
 app.listen(3000, () => {

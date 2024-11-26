@@ -30,7 +30,24 @@ body {
     display: block; /* Hace que el botón ocupe todo el ancho disponible */
     margin: 0 auto; /* Centra el botón horizontalmente */
 }
+.precio {
+    font-size: 18px;  /* Tamaño de fuente */
+    font-weight: 600; /* Semi-negrita */
+    color: #000; /* Color negro */
+    margin-top: 10px; /* Margen superior */
+}
 
+  .precio del { /* Estilo para el precio anterior tachado */
+    color: #757575; /* Gris claro */
+    font-size: 14px;
+    text-decoration: line-through; 
+    margin-right: 10px;
+}
+
+  .precio span { /* Estilo para el precio actual */
+    font-weight: 700; /* Negrita */
+    color: #12ec19e0; /* Rojo Nike */ 
+}
 .card:hover {
     transform: scale(1.05);
 }
