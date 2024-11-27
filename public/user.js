@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true }, 
     phone: { type: String, required: true, match: /^\d{10}$/ }, 
     email: { type: String, required: true, unique: true },      // Correo electrónico único
-    password: { type: String, required: true }                  // Contraseña hasheada
+    password: { type: String, required: true },
+    registrationDate: { type: Date, default: Date.now } // Fecha de registro
 });
 
 // Hashear la contraseña antes de guardarla

@@ -1,0 +1,30 @@
+
+/* Personalización CSS adicional */
+body {
+    background-color: #f4f4f9;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.navbar {
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: #333;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+}

@@ -7,6 +7,8 @@ const User = require('./public/user');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const ExcelJS = require('exceljs');
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,6 +32,12 @@ async function connectToDatabase() {
 
 connectToDatabase();
 
+const ADMIN_CREDENTIALS = {
+    username: 'adminmamastroso1',
+    password: 'trinity@_'
+};
+
+
 app.get('/', (req, res) => {
     res.redirect('/register'); // Página de registro
 });
@@ -40,47 +48,68 @@ app.get('/register', (req, res) => {
 });
 
 
-// Registro
-app.post('/register', async (req, res) => {
-    const { username, password, phone, email } = req.body;
-    console.log('Datos recibidos:', { username, password, phone, email }); 
-
-    const user = new User({ username, password, phone, email });
-
-    try {
-        await user.save(); 
-        console.log('Usuario registrado:', user); 
-        return res.redirect('/login.html'); 
-    } catch (err) {
-        console.error('Error al registrar al usuario:', err); 
-        return res.redirect('/register.html'); 
-    }
-});
-
-
-
-app.post('/authenticate', async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        // Busca el usuario por su nombre de usuario
-        const user = await User.findOne({ username });
-
-        // Si no se encuentra el usuario, devuelve un mensaje adecuado
-        if (!user) {
-            return res.status(401).send('Usuario no existe');
+    // Registro
+    app.post('/register', async (req, res) => {
+        const { username, password, phone, email } = req.body;
+        console.log('Datos recibidos:', { username, password, phone, email });
+    
+        // Crear el usuario
+        const user = new User({ username, password, phone, email });
+    
+        try {
+            // Guardar el usuario en la base de datos
+            await user.save();
+            
+            // La fecha de registro se guarda automáticamente en la base de datos
+            console.log('Usuario registrado:', user);
+            
+            // Redirigir al login (sin mostrar la fecha de registro)
+            return res.redirect('/login.html');
+        } catch (err) {
+            console.error('Error al registrar al usuario:', err);
+            return res.redirect('/register.html');
         }
-        // Verifica si la contraseña es correcta
-        const isMatch = await user.isCorrectPassword(password);
-        if (!isMatch) {
-            return res.status(401).send('Contraseña incorrecta');
-        }
-        // Si la autenticación es exitosa, redirigir con los datos del usuario
-        res.redirect(`/main.html?username=${user.username}&email=${user.email}&phone=${user.phone}`);
-    } catch (error) {
-        res.status(500).send('Error en el servidor: ' + error.message);
-    }
-});
+    });
+    
+
+
+        // Página del administrador
+        app.get('/admin-dashboard', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+        });
+
+
+        app.post('/authenticate', async (req, res) => {
+            const { username, password } = req.body;
+
+            // Verificar si las credenciales coinciden con las del administrador
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                return res.redirect('/admin-dashboard'); // Redirigir al dashboard de administrador
+            }
+
+            // Buscar el usuario por su nombre de usuario
+            try {
+                const user = await User.findOne({ username });
+
+                // Si no se encuentra el usuario, devolver un mensaje adecuado
+                if (!user) {
+                    return res.status(401).send('Usuario no existe');
+                }
+
+                // Verificar si la contraseña es correcta
+                const isMatch = await user.isCorrectPassword(password);
+                if (!isMatch) {
+                    return res.status(401).send('Contraseña incorrecta');
+                }
+
+                // Si la autenticación es exitosa, redirigir con los datos del usuario
+                // Incluir la fecha de registro en la respuesta
+                res.redirect(`/main.html?username=${user.username}&email=${user.email}&phone=${user.phone}&registrationDate=${user.registrationDate}`);
+            } catch (error) {
+                res.status(500).send('Error en el servidor: ' + error.message);
+            }
+        });
+
 
         app.post('/generate-pdf', (req, res) => {
             const { username, email, phone, product } = req.body;
@@ -112,8 +141,8 @@ app.post('/authenticate', async (req, res) => {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'wilsonsaavedra9988@gmail.com', // Cambiar por tu email
-                    pass: 'logh kuya xlqn pjky', // Cambiar por tu contraseña
+                    user: 'wilsonsaavedra9988@gmail.com', 
+                    pass: 'logh kuya xlqn pjky', 
                 },
             });
 
@@ -143,13 +172,58 @@ app.post('/authenticate', async (req, res) => {
             });
         });
 
+        // Ruta para generar el archivo Excel de usuarios
+        app.get('/generate-excel', async (req, res) => {
+            try {
+                const users = await User.find();
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Usuarios');
 
+                worksheet.columns = [
+                    { header: 'Username', key: 'username', width: 30 },
+                    { header: 'Phone', key: 'phone', width: 15 },
+                    { header: 'Email', key: 'email', width: 30 }
+                ];
+
+                users.forEach(user => {
+                    worksheet.addRow({
+                        username: user.username,
+                        phone: user.phone,
+                        email: user.email
+                    });
+                });
+
+                res.setHeader('Content-Disposition', 'attachment; filename=usuarios.xlsx');
+                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                await workbook.xlsx.write(res);
+                res.end();
+            } catch (err) {
+                console.error('Error al generar el archivo Excel:', err);
+                res.status(500).send('Error al obtener los usuarios o generar el archivo.');
+            }
+        });
+
+        
+        // Ruta para obtener usuarios y sus fechas de registro
+        app.get('/admin/users', async (req, res) => {
+            try {
+                const users = await User.find(); // Obtén todos los usuarios
+                // Devolver solo el username y la fecha de registro
+                const usersData = users.map(user => ({
+                    username: user.username,
+                    registrationDate: user.registrationDate
+                }));
+                res.json(usersData); // Enviar los datos en formato JSON
+            } catch (err) {
+                console.error('Error al obtener los usuarios:', err);
+                res.status(500).send('Error al obtener los usuarios');
+            }
+        });
 
 
 
 // Servidor
 app.listen(3000, () => {
-    console.log('Server started on port 3000');
 });
 
 module.exports = app;
