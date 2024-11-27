@@ -17,8 +17,8 @@ app.use('/design', express.static(path.join(__dirname, 'design')));
 app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
 
 // URI 
-const mongo_uri = "mongodb://localhost:27017/tiendadezapatos";
-
+const mongo_uri = "mongodb+srv://tiendadezapatos:tCtZgEXWITJ8Jwbk@cluster0.pjbys.mongodb.net/";
+const PORT = process.env.PORT ?? 4321
 // Conexión a MongoDB 
 async function connectToDatabase() {
     try {
@@ -39,7 +39,7 @@ const ADMIN_CREDENTIALS = {
 
 
 app.get('/', (req, res) => {
-    res.redirect('/register'); // Página de registro
+    res.redirect('/register'); 
 });
 
 
@@ -48,22 +48,17 @@ app.get('/register', (req, res) => {
 });
 
 
-    // Registro
     app.post('/register', async (req, res) => {
         const { username, password, phone, email } = req.body;
         console.log('Datos recibidos:', { username, password, phone, email });
     
-        // Crear el usuario
         const user = new User({ username, password, phone, email });
     
         try {
-            // Guardar el usuario en la base de datos
             await user.save();
             
-            // La fecha de registro se guarda automáticamente en la base de datos
             console.log('Usuario registrado:', user);
             
-            // Redirigir al login (sin mostrar la fecha de registro)
             return res.redirect('/login.html');
         } catch (err) {
             console.error('Error al registrar al usuario:', err);
@@ -73,7 +68,6 @@ app.get('/register', (req, res) => {
     
 
 
-        // Página del administrador
         app.get('/admin-dashboard', (req, res) => {
             res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
         });
@@ -82,28 +76,23 @@ app.get('/register', (req, res) => {
         app.post('/authenticate', async (req, res) => {
             const { username, password } = req.body;
 
-            // Verificar si las credenciales coinciden con las del administrador
             if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                return res.redirect('/admin-dashboard'); // Redirigir al dashboard de administrador
+                return res.redirect('/admin-dashboard'); 
             }
 
-            // Buscar el usuario por su nombre de usuario
             try {
                 const user = await User.findOne({ username });
 
-                // Si no se encuentra el usuario, devolver un mensaje adecuado
                 if (!user) {
                     return res.status(401).send('Usuario no existe');
                 }
 
-                // Verificar si la contraseña es correcta
                 const isMatch = await user.isCorrectPassword(password);
                 if (!isMatch) {
                     return res.status(401).send('Contraseña incorrecta');
                 }
 
-                // Si la autenticación es exitosa, redirigir con los datos del usuario
-                // Incluir la fecha de registro en la respuesta
+                
                 res.redirect(`/main.html?username=${user.username}&email=${user.email}&phone=${user.phone}&registrationDate=${user.registrationDate}`);
             } catch (error) {
                 res.status(500).send('Error en el servidor: ' + error.message);
@@ -114,13 +103,11 @@ app.get('/register', (req, res) => {
         app.post('/generate-pdf', (req, res) => {
             const { username, email, phone, product } = req.body;
 
-            // Crear el PDF
             const doc = new PDFDocument();
             const filePath = `./public/invoice_${Date.now()}.pdf`;
 
             doc.pipe(fs.createWriteStream(filePath));
 
-            // Contenido del PDF
             doc.fontSize(20).text('Factura de Compra', { align: 'center' });
             doc.moveDown();
 
@@ -137,7 +124,6 @@ app.get('/register', (req, res) => {
             doc.text('¡Gracias por tu compra!');
             doc.end();
 
-            // Configurar nodemailer para enviar el correo
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -146,7 +132,6 @@ app.get('/register', (req, res) => {
                 },
             });
 
-            // Opciones del correo
             const mailOptions = {
                 from: 'wilsonsaavedra9988@gmail.com',
                 to: email,
@@ -160,7 +145,6 @@ app.get('/register', (req, res) => {
                 ],
             };
 
-            // Enviar el correo
             transporter.sendMail(mailOptions, (err, info) => {
                 if (err) {
                     console.error('Error al enviar el correo:', err);
@@ -172,7 +156,6 @@ app.get('/register', (req, res) => {
             });
         });
 
-        // Ruta para generar el archivo Excel de usuarios
         app.get('/generate-excel', async (req, res) => {
             try {
                 const users = await User.find();
@@ -203,17 +186,14 @@ app.get('/register', (req, res) => {
             }
         });
 
-        
-        // Ruta para obtener usuarios y sus fechas de registro
         app.get('/admin/users', async (req, res) => {
             try {
-                const users = await User.find(); // Obtén todos los usuarios
-                // Devolver solo el username y la fecha de registro
+                const users = await User.find(); 
                 const usersData = users.map(user => ({
                     username: user.username,
                     registrationDate: user.registrationDate
                 }));
-                res.json(usersData); // Enviar los datos en formato JSON
+                res.json(usersData); 
             } catch (err) {
                 console.error('Error al obtener los usuarios:', err);
                 res.status(500).send('Error al obtener los usuarios');
@@ -223,7 +203,8 @@ app.get('/register', (req, res) => {
 
 
 // Servidor
-app.listen(3000, () => {
-});
+app.listen(PORT,'0.0.0.0',()=>{
+    console.log(`Server on port ${PORT}`);
+})
 
 module.exports = app;

@@ -1,9 +1,15 @@
-# Usa la imagen oficial de Nginx
-FROM nginx:alpine
+FROM node:18-alpine
 
-# Copia los archivos HTML al directorio de Nginx
-COPY . /usr/share/nginx/html
+WORKDIR /app
 
-# Exponer el puerto 80 para acceder a la página
-EXPOSE 80
+COPY package.json package-lock.json ./
 
+RUN apk add --no-cache python3 make g++ 
+
+RUN npm install 
+
+
+COPY . .
+
+EXPOSE 3000
+CMD ["node", "app.js"]
